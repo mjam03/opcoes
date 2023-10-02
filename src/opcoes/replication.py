@@ -1,3 +1,5 @@
+"""Module for generating replications for options """
+
 import numpy as np
 
 from opcoes.black_scholes import compute_greeks
@@ -6,7 +8,6 @@ from opcoes.simulation import generate_paths
 
 
 def generate_dh_replications(pxs, deltas, op_pxs, rf, div, time_points):
-
     # we have 2 jobs:
     # - compute the value of the stock we hold at each time point (easy)
     # - compute the running cash balance from divs, delta rehedging (hard)
@@ -36,7 +37,6 @@ def generate_dh_replications(pxs, deltas, op_pxs, rf, div, time_points):
     cfs = [np.zeros(len(pxs[:, 0]))]
 
     for drh, dcf in zip(delta_rehedge_cfs.T, div_cfs.T):
-
         # get previous cash balance
         prev_cash = cbs[-1]
         # future value it
@@ -58,7 +58,6 @@ def generate_dh_replications(pxs, deltas, op_pxs, rf, div, time_points):
 
 
 def generate_vh_replications(pxs, pf_vega, rf, div, time_points, hedge_greeks):
-
     # first we work out how much of the hedge instrument we need to hold
     # at each point to flatten the vega
     hedge_vega = hedge_greeks["vega"]
@@ -102,10 +101,7 @@ def generate_vh_replications(pxs, pf_vega, rf, div, time_points, hedge_greeks):
     hedge_cfs = [np.zeros(len(pxs[:, 0]))]
 
     # now let's walk through each sim
-    for h_drh, h_dcf, h_rhp in zip(
-        hedge_delta_rehedge_cfs.T, hedge_div_cfs.T, rehedge_prems.T
-    ):
-
+    for h_drh, h_dcf, h_rhp in zip(hedge_delta_rehedge_cfs.T, hedge_div_cfs.T, rehedge_prems.T):
         # get previous cash balance
         prev_cash = hedge_cbs[-1]
         # future value it
@@ -129,7 +125,6 @@ def generate_vh_replications(pxs, pf_vega, rf, div, time_points, hedge_greeks):
 
 
 def generate_replications(pxs, deltas, call_pxs, risk_free, divs, points):
-
     # compute stock values at each point in time
     stock_values = pxs * deltas
 
@@ -153,7 +148,6 @@ def generate_replications(pxs, deltas, call_pxs, risk_free, divs, points):
     cfs = [np.zeros(len(pxs[:, 0]))]
 
     for drh, dcf in zip(delta_rehedge_cfs.T, div_cfs.T):
-
         # get previous cash balance
         prev_cash = cbs[-1]
         # future value it
@@ -183,7 +177,6 @@ def run_delta_hedge_portfolio_sim(
     hedge_vols=None,
     greeks=["delta", "gamma", "vega"],
 ):
-
     # churn out sims using sigma for annual std dev of paths
     rets, pxs = generate_paths(px, rf - div, sigma, years, time_points, sims)
 
@@ -235,9 +228,7 @@ def run_delta_hedge_portfolio_sim(
     pf_deltas = pf_greeks["delta"]
 
     # now let's compute the delta replication
-    repls = generate_dh_replications(
-        pxs, pf_deltas, pf_pxs, rf, div, time_points
-    )
+    repls = generate_dh_replications(pxs, pf_deltas, pf_pxs, rf, div, time_points)
     # return prices, returns, theo pf value, replication pf value and greeks
     return pxs, rets, pf_greeks["px"], repls, pf_greeks
 
@@ -254,7 +245,6 @@ def run_delta_hedge_sim(
     iv=None,
     hedge_vol=None,
 ):
-
     # churn out sims using sigma for annual std dev of paths
     rets, pxs = generate_paths(px, rf - div, sigma, years, points, sims)
     # churn out option tvs, deltas and gammas based on iv with option
@@ -275,8 +265,6 @@ def run_delta_hedge_sim(
     )
 
     # create replication values
-    stock_values, cbs, cfs = generate_replications(
-        pxs, deltas, call_pxs, rf, div, points
-    )
+    stock_values, cbs, _ = generate_replications(pxs, deltas, call_pxs, rf, div, points)
 
     return pxs, rets, call_pxs, stock_values + cbs, deltas, gammas, vegas

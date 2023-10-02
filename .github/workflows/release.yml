@@ -1,0 +1,63 @@
+name: Release
+
+# runs on new successful push to master
+# success is controlled by the tests workflow
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  release:
+    name: Release
+    # just run on latest os with 3.10 python
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v2.4.0
+        with:
+          # we need previous commits to ascertain whether this commit is a version bump so we should publish
+          fetch-depth: 2
+      # now we need to install python, pip and poetry to get the version number
+      - name: Set up Python
+        uses: actions/setup-python@v2.2.2
+        with:
+          python-version: "3.10"
+      # install CI build dependencies
+      - name: Upgrade pip
+        run: |
+          pip install --constraint=.github/workflows/constraints.txt pip
+          pip --version
+      - name: Install Poetry
+        run: |
+          pip install --constraint=.github/workflows/constraints.txt poetry
+          poetry --version
+      # checks if there was a commit before this one
+      # HEAD^ gets 1 commit before HEAD
+      # rev-parse --verify --quiet returns git object sha
+      # whole command sets this equal to a var called sha
+      # that is used in the next step
+      - name: Check if there is a parent commit
+        id: check-parent-commit
+        run: echo "sha=$(git rev-parse --verify --quiet HEAD^)" >> $GITHUB_OUTPUT
+      # get our version number i.e. $2 gets 0.2.0 from mps-python-util 0.2.0 and set as var "version"
+      - name: Get version tag
+        id: get-version
+        run: echo "version=$(poetry version | awk '{ print $2 }')" >> $GITHUB_OUTPUT
+      # creates a new tag if the version number is new i.e. this is first commit with 0.2.0
+      - name: Detect and tag new version
+        id: check-version
+        if: steps.check-parent-commit.outputs.sha
+        uses: salsify/action-detect-and-tag-new-version@v2.0.1
+        with:
+          version-command: |
+            bash -o pipefail -c "poetry version | awk '{ print \$2 }'"
+      # use the retrieved version to publish a release if the version is new
+      - name: Create Release
+        id: create-release
+        if: steps.check-version.outputs.tag
+        run: gh release create ${{ steps.get-version.outputs.version }} --latest --generate-notes --target master
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

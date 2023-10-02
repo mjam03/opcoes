@@ -129,7 +129,8 @@ dmypy.json
 .pyre/
 
 # remove notebooks
-notebooks
+notebooks/dev_notebooks
+notebooks/old_notebooks
 
 # remove other files
 .DS_Store

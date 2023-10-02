@@ -1,0 +1,7 @@
+# constraints file to keep CI build packages the same
+# this keeps builds deterministic i.e. same outcome for same input
+# rather than code remaining unchanged but .whl file being different
+pip==23.0.1
+nox==2022.11.21
+nox-poetry==1.0.3
+poetry==1.6.1

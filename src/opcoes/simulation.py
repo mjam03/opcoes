@@ -1,3 +1,5 @@
+"""Module for creating simulated paths for option pricing"""
+
 import numpy as np
 from typing import Tuple
 
@@ -10,7 +12,6 @@ def generate_paths(
     points: int,
     sims: int,
 ) -> Tuple[np.ndarray, np.ndarray]:
-
     # create numpy PCG PRNG
     rng = np.random.default_rng(seed=123)
     # create random numbers

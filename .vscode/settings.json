@@ -1,7 +1,39 @@
 {
-    "python.linting.flake8Enabled": true,
-    "python.linting.enabled": true,
-    "python.linting.mypyEnabled": true,
-    "python.pythonPath": "~/dev/opcoes/.venv/bin/python",
+  "python.linting.enabled": true,
+  "python.linting.lintOnSave": true,
+  "python.linting.banditEnabled": false,
+  "python.linting.flake8Enabled": true,
+  "python.linting.pylintEnabled": true,
+  "python.linting.mypyEnabled": true,
+  "python.linting.mypyCategorySeverity.error": "Warning",
+  "python.formatting.provider": "black",
+  "python.pythonPath": ".venv/bin/python",
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "autoDocstring.docstringFormat": "google",
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "black-formatter.args": [
+    "--line-length=140"
+  ],
+  "python.formatting.blackArgs": [
+    "--line-length=140"
+  ],
+  "python.linting.flake8Args": [
+    "--max-line-length=140",
+    "--ignore=E203,W503"
+  ],
+  "python.linting.pylintArgs": [
+    "--max-line-length=140",
+    "--good-names=a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,df,db,ls,mt,fp,mw,st,et,sh,fh,ch,tn,pc,pg,mu,es,sc",
+    "--disable=W0703,E1136"
+  ],
+  "python.linting.mypyArgs": [
+    "--implicit-optional"
+  ],
+  "python.testing.pytestArgs": [
+    "tests"
+  ]
 }
-
